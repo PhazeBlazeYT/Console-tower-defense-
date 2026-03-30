@@ -64,6 +64,7 @@
   let gameOver = false, runWon = false;
   let waveInProgress = false, spawnTimer = 0, waveQueue = [];
   let shopScroll = 0, wheelAccum = 0;
+  let mapScroll = 0;
   let autoNextWave = false, gameSpeed = 1;
   let currentScreen = 'home';
   let sceneryByMap = [];
@@ -213,9 +214,36 @@
   const projectiles = [];
 
   const mapDefs = [
-    { name: 'Valley Bend', color: '#4caf50', lanes: [[[0,0.55],[0.14,0.55],[0.14,0.18],[0.39,0.18],[0.39,0.82],[0.64,0.82],[0.64,0.3],[0.9,0.3],[0.9,0.85],[1,0.85]]] },
-    { name: 'Twin Pass', color: '#5d9c59', lanes: [[[0,0.25],[0.2,0.25],[0.2,0.58],[0.52,0.58],[0.52,0.2],[1,0.2]], [[0,0.75],[0.24,0.75],[0.24,0.42],[0.6,0.42],[0.6,0.85],[1,0.85]]] },
-    { name: 'Crossroads', color: '#6ea85f', lanes: [[[0,0.5],[0.22,0.5],[0.22,0.2],[0.5,0.2],[0.5,0.8],[0.78,0.8],[0.78,0.5],[1,0.5]], [[0,0.15],[0.32,0.15],[0.32,0.5],[0.68,0.5],[0.68,0.15],[1,0.15]], [[0,0.85],[0.32,0.85],[0.32,0.5],[0.68,0.5],[0.68,0.85],[1,0.85]]] },
+    {
+      name: 'Valley Bend', color: '#4caf50',
+      lanes: [[[0,0.55],[0.14,0.55],[0.14,0.18],[0.39,0.18],[0.39,0.82],[0.64,0.82],[0.64,0.3],[0.9,0.3],[0.9,0.85],[1,0.85]]],
+      water: [{ shape:'ellipse', x:0.78, y:0.14, rx:0.1, ry:0.06, rot:0.2 }, { shape:'ellipse', x:0.56, y:0.48, rx:0.06, ry:0.04, rot:0 }],
+    },
+    {
+      name: 'Twin Pass', color: '#5d9c59',
+      lanes: [[[0,0.25],[0.2,0.25],[0.2,0.58],[0.52,0.58],[0.52,0.2],[1,0.2]], [[0,0.75],[0.24,0.75],[0.24,0.42],[0.6,0.42],[0.6,0.85],[1,0.85]]],
+      water: [{ shape:'ellipse', x:0.42, y:0.85, rx:0.1, ry:0.065, rot:0.12 }, { shape:'ellipse', x:0.74, y:0.32, rx:0.08, ry:0.05, rot:-0.18 }],
+    },
+    {
+      name: 'Crossroads', color: '#6ea85f',
+      lanes: [[[0,0.5],[0.22,0.5],[0.22,0.2],[0.5,0.2],[0.5,0.8],[0.78,0.8],[0.78,0.5],[1,0.5]], [[0,0.15],[0.32,0.15],[0.32,0.5],[0.68,0.5],[0.68,0.15],[1,0.15]], [[0,0.85],[0.32,0.85],[0.32,0.5],[0.68,0.5],[0.68,0.85],[1,0.85]]],
+      water: [{ shape:'ellipse', x:0.5, y:0.5, rx:0.12, ry:0.08, rot:0 }, { shape:'ellipse', x:0.16, y:0.5, rx:0.06, ry:0.04, rot:0.2 }, { shape:'ellipse', x:0.84, y:0.5, rx:0.06, ry:0.04, rot:-0.2 }],
+    },
+    {
+      name: 'River Fork', color: '#7cad64',
+      lanes: [[[0,0.14],[0.18,0.14],[0.18,0.5],[0.46,0.5],[0.46,0.82],[0.72,0.82],[0.72,0.36],[1,0.36]], [[0,0.86],[0.22,0.86],[0.22,0.54],[0.58,0.54],[0.58,0.18],[1,0.18]]],
+      water: [{ shape:'rect', x:0.35, y:0.05, w:0.08, h:0.9 }, { shape:'ellipse', x:0.65, y:0.56, rx:0.11, ry:0.07, rot:0.05 }, { shape:'ellipse', x:0.84, y:0.74, rx:0.07, ry:0.05, rot:-0.2 }],
+    },
+    {
+      name: 'Lagoon Ring', color: '#6fb06f',
+      lanes: [[[0,0.5],[0.16,0.5],[0.16,0.2],[0.5,0.2],[0.5,0.8],[0.84,0.8],[0.84,0.5],[1,0.5]], [[0,0.08],[0.28,0.08],[0.28,0.92],[0.72,0.92],[0.72,0.08],[1,0.08]]],
+      water: [{ shape:'ellipse', x:0.5, y:0.5, rx:0.16, ry:0.1, rot:0 }, { shape:'ellipse', x:0.5, y:0.5, rx:0.08, ry:0.05, rot:0 }],
+    },
+    {
+      name: 'Delta Maze', color: '#78b46b',
+      lanes: [[[0,0.22],[0.2,0.22],[0.2,0.64],[0.42,0.64],[0.42,0.3],[0.7,0.3],[0.7,0.7],[1,0.7]], [[0,0.78],[0.18,0.78],[0.18,0.4],[0.5,0.4],[0.5,0.9],[0.86,0.9],[0.86,0.46],[1,0.46]], [[0,0.5],[0.12,0.5],[0.12,0.12],[0.6,0.12],[0.6,0.56],[1,0.56]]],
+      water: [{ shape:'rect', x:0.3, y:0.12, w:0.07, h:0.78 }, { shape:'rect', x:0.62, y:0.04, w:0.08, h:0.84 }, { shape:'ellipse', x:0.84, y:0.2, rx:0.09, ry:0.06, rot:0.18 }],
+    },
   ];
 
   const xpToNextLevel = (level) => 100 + level * 70;
@@ -442,6 +470,40 @@
 
   function getMapPaths() { return getCurrentMap().lanes.map(toPath); }
 
+  function isWaterTowerType(type) {
+    return type === 'submarine' || type === 'boat';
+  }
+
+  function isPointInWater(x, y) {
+    const map = getCurrentMap();
+    const waterAreas = map.water || [];
+    const mapWidth = width - SIDE_PANEL;
+    return waterAreas.some((area) => {
+      if (area.shape === 'ellipse') {
+        const cx = area.x * mapWidth;
+        const cy = area.y * height;
+        const rx = Math.max(1, area.rx * mapWidth);
+        const ry = Math.max(1, area.ry * height);
+        const rot = area.rot || 0;
+        const dx = x - cx;
+        const dy = y - cy;
+        const cos = Math.cos(-rot);
+        const sin = Math.sin(-rot);
+        const ex = dx * cos - dy * sin;
+        const ey = dx * sin + dy * cos;
+        return (ex * ex) / (rx * rx) + (ey * ey) / (ry * ry) <= 1;
+      }
+      if (area.shape === 'rect') {
+        const rx = area.x * mapWidth;
+        const ry = area.y * height;
+        const rw = area.w * mapWidth;
+        const rh = area.h * height;
+        return x >= rx && x <= rx + rw && y >= ry && y <= ry + rh;
+      }
+      return false;
+    });
+  }
+
   function resize() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -451,9 +513,12 @@
 
   function buildScenery(mapIndex) {
     const presets = [
-      [{ type:'tree',x:0.08,y:0.14 },{ type:'tree',x:0.28,y:0.9 },{ type:'rock',x:0.73,y:0.62 },{ type:'pond',x:0.78,y:0.14 },{ type:'bush',x:0.46,y:0.5 },{ type:'rock',x:0.14,y:0.34 }],
-      [{ type:'tree',x:0.1,y:0.52 },{ type:'tree',x:0.34,y:0.12 },{ type:'pond',x:0.42,y:0.85 },{ type:'bush',x:0.58,y:0.12 },{ type:'rock',x:0.72,y:0.52 },{ type:'bush',x:0.84,y:0.72 }],
-      [{ type:'tree',x:0.12,y:0.12 },{ type:'tree',x:0.12,y:0.88 },{ type:'pond',x:0.5,y:0.5 },{ type:'rock',x:0.86,y:0.12 },{ type:'rock',x:0.86,y:0.88 },{ type:'bush',x:0.5,y:0.08 }],
+      [{ type:'tree',x:0.08,y:0.14 },{ type:'tree',x:0.28,y:0.9 },{ type:'rock',x:0.73,y:0.62 },{ type:'pond',x:0.78,y:0.14 },{ type:'bush',x:0.46,y:0.5 },{ type:'rock',x:0.14,y:0.34 },{ type:'flowers',x:0.6,y:0.12 },{ type:'stump',x:0.9,y:0.62 }],
+      [{ type:'tree',x:0.1,y:0.52 },{ type:'tree',x:0.34,y:0.12 },{ type:'pond',x:0.42,y:0.85 },{ type:'bush',x:0.58,y:0.12 },{ type:'rock',x:0.72,y:0.52 },{ type:'bush',x:0.84,y:0.72 },{ type:'crate',x:0.22,y:0.92 },{ type:'flowers',x:0.92,y:0.2 }],
+      [{ type:'tree',x:0.12,y:0.12 },{ type:'tree',x:0.12,y:0.88 },{ type:'pond',x:0.5,y:0.5 },{ type:'rock',x:0.86,y:0.12 },{ type:'rock',x:0.86,y:0.88 },{ type:'bush',x:0.5,y:0.08 },{ type:'stump',x:0.52,y:0.92 },{ type:'flowers',x:0.32,y:0.5 }],
+      [{ type:'tree',x:0.08,y:0.08 },{ type:'rock',x:0.24,y:0.22 },{ type:'bush',x:0.3,y:0.86 },{ type:'crate',x:0.52,y:0.24 },{ type:'flowers',x:0.82,y:0.14 },{ type:'stump',x:0.9,y:0.9 }],
+      [{ type:'tree',x:0.08,y:0.24 },{ type:'tree',x:0.1,y:0.78 },{ type:'rock',x:0.28,y:0.46 },{ type:'bush',x:0.72,y:0.12 },{ type:'crate',x:0.9,y:0.66 },{ type:'flowers',x:0.5,y:0.06 },{ type:'stump',x:0.94,y:0.28 }],
+      [{ type:'tree',x:0.06,y:0.62 },{ type:'rock',x:0.24,y:0.1 },{ type:'bush',x:0.4,y:0.92 },{ type:'crate',x:0.74,y:0.1 },{ type:'flowers',x:0.78,y:0.84 },{ type:'stump',x:0.92,y:0.58 },{ type:'pond',x:0.84,y:0.2 }],
     ];
     return (presets[mapIndex] || []).map((s) => ({ ...s, px: s.x * (width - SIDE_PANEL), py: s.y * height }));
   }
@@ -777,24 +842,32 @@
   function updateAgents() {}
 
   function drawHome() {
+    const playWidth = width - SIDE_PANEL;
+    const playCenterX = playWidth / 2;
+
     ctx.fillStyle = '#102a43';
     ctx.fillRect(0, 0, width, height);
 
     ctx.fillStyle = '#fff';
     ctx.font = '700 52px sans-serif';
-    ctx.fillText('CONSOLE TOWER DEFENSE (MERGED)', width / 2 - 385, 110);
+    ctx.fillText('CONSOLE TOWER DEFENSE (MERGED)', playCenterX - 385, 110);
     ctx.font = '500 18px sans-serif';
-    ctx.fillText('Pick map + difficulty, unlock premium towers, then START GAME', width / 2 - 250, 145);
+    ctx.fillText('Pick map + difficulty, unlock premium towers, then START GAME', playCenterX - 250, 145);
     ctx.font = '700 20px sans-serif';
-    ctx.fillText(`Bank: ${profile.coins} Coins | Monkey Money: ${profile.monkeyMoney}`, width / 2 - 190, 175);
+    ctx.fillText(`Bank: ${profile.coins} Coins | Monkey Money: ${profile.monkeyMoney}`, playCenterX - 190, 175);
 
     const cardW = 220, gap = 26;
-    const totalW = mapDefs.length * cardW + (mapDefs.length - 1) * gap;
-    const startX = (width - SIDE_PANEL - totalW) / 2;
+    const visibleMapCards = Math.min(4, mapDefs.length);
+    const maxMapScroll = Math.max(0, mapDefs.length - visibleMapCards);
+    mapScroll = Math.max(0, Math.min(mapScroll, maxMapScroll));
+    const totalW = visibleMapCards * cardW + (visibleMapCards - 1) * gap;
+    const startX = (playWidth - totalW) / 2;
     const y = 220;
 
-    mapDefs.forEach((m, i) => {
-      const x = startX + i * (cardW + gap);
+    const visibleMaps = mapDefs.slice(mapScroll, mapScroll + visibleMapCards);
+    visibleMaps.forEach((m, idx) => {
+      const i = mapScroll + idx;
+      const x = startX + idx * (cardW + gap);
       ctx.fillStyle = state.selectedMap === i ? '#ffd166' : '#324a5f';
       ctx.fillRect(x, y, cardW, 170);
       ctx.fillStyle = '#111';
@@ -804,10 +877,34 @@
       ctx.fillText(`${m.lanes.length} path(s)`, x + 20, y + 62);
     });
 
+    if (maxMapScroll > 0) {
+      const arrowW = 40;
+      const arrowGap = 14;
+      const leftX = startX - arrowGap - arrowW;
+      const rightX = startX + totalW + arrowGap;
+      const arrowY = y + 62;
+      ctx.fillStyle = mapScroll > 0 ? '#ffd166' : '#5d6f80';
+      ctx.fillRect(leftX, arrowY, 40, 44);
+      ctx.fillStyle = '#111';
+      ctx.font = '700 24px sans-serif';
+      ctx.fillText('‹', leftX + 14, arrowY + 29);
+
+      ctx.fillStyle = mapScroll < maxMapScroll ? '#ffd166' : '#5d6f80';
+      ctx.fillRect(rightX, arrowY, 40, 44);
+      ctx.fillStyle = '#111';
+      ctx.fillText('›', rightX + 14, arrowY + 29);
+
+      ctx.fillStyle = '#d7e3fc';
+      ctx.font = '12px sans-serif';
+      const mapInfo = `Maps ${mapScroll + 1}-${Math.min(mapDefs.length, mapScroll + visibleMapCards)} / ${mapDefs.length} (scroll wheel works too)`;
+      const infoX = startX + totalW / 2 - ctx.measureText(mapInfo).width / 2;
+      ctx.fillText(mapInfo, infoX, y + 190);
+    }
+
     const diffY = 415;
     const diffKeys = ['easy', 'medium', 'hard', 'impoppable'];
     diffKeys.forEach((d, idx) => {
-      const x = width / 2 - 265 + idx * 132;
+      const x = playCenterX - 265 + idx * 132;
       ctx.fillStyle = state.difficulty === d ? '#ffd166' : '#3a506b';
       ctx.fillRect(x, diffY, 122, 36);
       ctx.fillStyle = state.difficulty === d ? '#111' : '#fff';
@@ -817,13 +914,13 @@
     ctx.fillStyle = '#d7e3fc';
     ctx.font = '12px sans-serif';
     const baseWin = 80 + MAX_WAVES * 6;
-    ctx.fillText(`Win Coins: Easy ${Math.floor(baseWin * difficultyDefs.easy.coinMult)} | Medium ${Math.floor(baseWin * difficultyDefs.medium.coinMult)} | Hard ${Math.floor(baseWin * difficultyDefs.hard.coinMult)}`, width / 2 - 250, 463);
+    ctx.fillText(`Win Coins: Easy ${Math.floor(baseWin * difficultyDefs.easy.coinMult)} | Medium ${Math.floor(baseWin * difficultyDefs.medium.coinMult)} | Hard ${Math.floor(baseWin * difficultyDefs.hard.coinMult)}`, playCenterX - 250, 463);
 
     ctx.fillStyle = '#2a9d8f';
-    ctx.fillRect(width / 2 - 120, 470, 240, 56);
+    ctx.fillRect(playCenterX - 120, 470, 240, 56);
     ctx.fillStyle = '#fff';
     ctx.font = '700 24px sans-serif';
-    ctx.fillText('START GAME', width / 2 - 74, 506);
+    ctx.fillText('START GAME', playCenterX - 74, 506);
 
     const premiumKeys = Object.keys(towerDefs).filter((k) => towerDefs[k].unlockCoins);
     const premiumY = 560, premiumCardW = 150, premiumGap = 12;
@@ -1026,6 +1123,28 @@
     ctx.fillStyle = map.color;
     ctx.fillRect(0, 0, width, height);
 
+    const mapWidth = width - SIDE_PANEL;
+    (map.water || []).forEach((area) => {
+      ctx.fillStyle = '#3aa6d7';
+      if (area.shape === 'ellipse') {
+        ctx.beginPath();
+        ctx.ellipse(area.x * mapWidth, area.y * height, area.rx * mapWidth, area.ry * height, area.rot || 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#8dd6f0';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      } else if (area.shape === 'rect') {
+        const rx = area.x * mapWidth;
+        const ry = area.y * height;
+        const rw = area.w * mapWidth;
+        const rh = area.h * height;
+        ctx.fillRect(rx, ry, rw, rh);
+        ctx.strokeStyle = '#8dd6f0';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(rx, ry, rw, rh);
+      }
+    });
+
     const scenery = sceneryByMap[state.selectedMap] || [];
     scenery.forEach((s) => {
       if (s.type === 'tree') {
@@ -1037,6 +1156,14 @@
         ctx.fillStyle = '#4fc3f7'; ctx.beginPath(); ctx.ellipse(s.px, s.py, 26, 16, 0.2, 0, Math.PI * 2); ctx.fill();
       } else if (s.type === 'bush') {
         ctx.fillStyle = '#388e3c'; ctx.beginPath(); ctx.arc(s.px - 8, s.py, 10, 0, Math.PI * 2); ctx.arc(s.px + 2, s.py - 5, 11, 0, Math.PI * 2); ctx.arc(s.px + 12, s.py, 9, 0, Math.PI * 2); ctx.fill();
+      } else if (s.type === 'flowers') {
+        ctx.fillStyle = '#f48fb1'; ctx.beginPath(); ctx.arc(s.px - 6, s.py, 4, 0, Math.PI * 2); ctx.arc(s.px + 6, s.py + 2, 4, 0, Math.PI * 2); ctx.arc(s.px, s.py - 4, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ffeb3b'; ctx.beginPath(); ctx.arc(s.px, s.py, 3, 0, Math.PI * 2); ctx.fill();
+      } else if (s.type === 'stump') {
+        ctx.fillStyle = '#6d4c41'; ctx.beginPath(); ctx.ellipse(s.px, s.py, 10, 7, 0, 0, Math.PI * 2); ctx.fill();
+      } else if (s.type === 'crate') {
+        ctx.fillStyle = '#a1887f'; ctx.fillRect(s.px - 9, s.py - 9, 18, 18);
+        ctx.strokeStyle = '#6d4c41'; ctx.lineWidth = 2; ctx.strokeRect(s.px - 9, s.py - 9, 18, 18);
       }
     });
 
@@ -1080,8 +1207,11 @@
       const def = towerDefs[state.selectedTowerType];
       const unlocked = isTowerUnlocked(state.selectedTowerType);
       const towerTooClose = towers.some((t) => Math.hypot(t.x - state.hover.x, t.y - state.hover.y) < 44);
+      const isWaterTower = isWaterTowerType(state.selectedTowerType);
+      const isInWater = isPointInWater(state.hover.x, state.hover.y);
+      const badTerrain = isWaterTower ? !isInWater : isInWater;
       ctx.globalAlpha = 0.45;
-      ctx.fillStyle = !unlocked || isPointOnAnyPath(state.hover.x, state.hover.y) || towerTooClose ? '#ef5350' : def.color;
+      ctx.fillStyle = !unlocked || isPointOnAnyPath(state.hover.x, state.hover.y) || towerTooClose || badTerrain ? '#ef5350' : def.color;
       ctx.beginPath(); ctx.arc(state.hover.x, state.hover.y, 24, 0, Math.PI * 2); ctx.fill();
       ctx.globalAlpha = 1;
     }
@@ -1236,6 +1366,9 @@
     if (showAdminLogin) return;
 
     if (currentScreen === 'home') {
+      const playWidth = width - SIDE_PANEL;
+      const playCenterX = playWidth / 2;
+
       if (x >= width - SIDE_PANEL - 160 && x <= width - SIDE_PANEL - 12 && y >= 20 && y <= 52) {
         if (adminUnlocked) {
           showAdminPanel = !showAdminPanel;
@@ -1247,18 +1380,33 @@
         return;
       }
       const cardW = 220, gap = 26;
-      const totalW = mapDefs.length * cardW + (mapDefs.length - 1) * gap;
-      const startX = (width - SIDE_PANEL - totalW) / 2;
+      const visibleMapCards = Math.min(4, mapDefs.length);
+      const maxMapScroll = Math.max(0, mapDefs.length - visibleMapCards);
+      mapScroll = Math.max(0, Math.min(mapScroll, maxMapScroll));
+      const totalW = visibleMapCards * cardW + (visibleMapCards - 1) * gap;
+      const startX = (playWidth - totalW) / 2;
       const cardY = 220;
-      for (let i = 0; i < mapDefs.length; i++) {
-        const cx = startX + i * (cardW + gap);
+
+      if (maxMapScroll > 0) {
+        const arrowW = 40;
+        const arrowGap = 14;
+        const leftX = startX - arrowGap - arrowW;
+        const rightX = startX + totalW + arrowGap;
+        const arrowY = cardY + 62;
+        if (x >= leftX && x <= leftX + 40 && y >= arrowY && y <= arrowY + 44) { mapScroll = Math.max(0, mapScroll - 1); return; }
+        if (x >= rightX && x <= rightX + 40 && y >= arrowY && y <= arrowY + 44) { mapScroll = Math.min(maxMapScroll, mapScroll + 1); return; }
+      }
+
+      for (let idx = 0; idx < visibleMapCards; idx++) {
+        const i = mapScroll + idx;
+        const cx = startX + idx * (cardW + gap);
         if (x >= cx && x <= cx + cardW && y >= cardY && y <= cardY + 170) { state.selectedMap = i; return; }
       }
       for (const [idx, d] of ['easy', 'medium', 'hard', 'impoppable'].entries()) {
-        const bx = width / 2 - 265 + idx * 132;
+        const bx = playCenterX - 265 + idx * 132;
         if (x >= bx && x <= bx + 122 && y >= 415 && y <= 451) { state.difficulty = d; return; }
       }
-      if (x >= width / 2 - 120 && x <= width / 2 + 120 && y >= 470 && y <= 526) {
+      if (x >= playCenterX - 120 && x <= playCenterX + 120 && y >= 470 && y <= 526) {
         resetRun(); currentScreen = 'game'; return;
       }
 
@@ -1374,7 +1522,10 @@
     const def = towerDefs[state.selectedTowerType];
     if (!isTowerUnlocked(state.selectedTowerType)) return;
     const towerTooClose = towers.some((t) => Math.hypot(t.x - x, t.y - y) < 44);
+    const isWaterTower = isWaterTowerType(state.selectedTowerType);
+    const isInWater = isPointInWater(x, y);
     if (state.money < def.cost || isPointOnAnyPath(x, y) || towerTooClose) return;
+    if ((isWaterTower && !isInWater) || (!isWaterTower && isInWater)) return;
 
     const discount = towers
       .filter(t => t.type === 'village')
@@ -1406,6 +1557,22 @@
   }
 
   function onWheel(e) {
+    if (currentScreen === 'home') {
+      const cardW = 220, gap = 26;
+      const visibleMapCards = Math.min(4, mapDefs.length);
+      const maxMapScroll = Math.max(0, mapDefs.length - visibleMapCards);
+      if (maxMapScroll > 0 && e.clientY >= 210 && e.clientY <= 410 && e.clientX <= width - SIDE_PANEL) {
+        e.preventDefault();
+        wheelAccum += e.deltaY;
+        const stepThreshold = 160;
+        if (Math.abs(wheelAccum) < stepThreshold) return;
+        const steps = Math.trunc(wheelAccum / stepThreshold);
+        wheelAccum -= steps * stepThreshold;
+        mapScroll = Math.max(0, Math.min(mapScroll + steps, maxMapScroll));
+        return;
+      }
+    }
+
     const panelX = width - SIDE_PANEL;
     if (e.clientX < panelX) return;
 
