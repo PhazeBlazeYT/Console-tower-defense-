@@ -24,273 +24,37 @@
   });
   root.appendChild(hint);
 
-  // ── ADMIN PANEL ──────────────────────────────────────────────────────────────
+  // ADMIN PANEL (password protected)
   const ADMIN_PASSWORD = '2589';
   let adminUnlocked = false;
   let showAdminPanel = false;
-  let adminPasswordInput = '';
-  let adminMessage = '';
-  let adminMessageTimer = 0;
   let showAdminLogin = false;
 
   const adminPanel = document.createElement('div');
   Object.assign(adminPanel.style, {
-    position: 'fixed', top: '60px', right: '350px', width: '320px',
-    background: '#0d1b2a', border: '2px solid #ffd166', borderRadius: '10px',
-    padding: '14px', zIndex: '2147483648', color: '#fff',
-    fontFamily: 'system-ui,sans-serif', fontSize: '13px', display: 'none',
-    boxShadow: '0 4px 32px #000a',
+    position: 'fixed', top: '60px', right: '350px', width: '320px', background: '#0d1b2a',
+    border: '2px solid #ffd166', borderRadius: '10px', padding: '14px', zIndex: '2147483648',
+    color: '#fff', fontFamily: 'system-ui,sans-serif', fontSize: '13px', display: 'none', boxShadow: '0 4px 32px #000a',
   });
   root.appendChild(adminPanel);
 
   const adminLoginBox = document.createElement('div');
   Object.assign(adminLoginBox.style, {
-    position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
-    width: '340px', background: '#0d1b2a', border: '2px solid #ffd166',
-    borderRadius: '12px', padding: '28px', zIndex: '2147483649', color: '#fff',
-    fontFamily: 'system-ui,sans-serif', textAlign: 'center', display: 'none',
-    boxShadow: '0 8px 40px #000c',
+    position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '340px',
+    background: '#0d1b2a', border: '2px solid #ffd166', borderRadius: '12px', padding: '20px',
+    zIndex: '2147483649', color: '#fff', fontFamily: 'system-ui,sans-serif', textAlign: 'center', display: 'none',
   });
   adminLoginBox.innerHTML = `
-    <div style="font-size:22px;font-weight:700;margin-bottom:8px;">🔒 Admin Access</div>
-    <div style="font-size:13px;color:#aaa;margin-bottom:18px;">Enter the admin password to continue</div>
+    <div style="font-size:20px;font-weight:700;margin-bottom:8px;">🔒 Admin Access</div>
     <input id="td-admin-pw" type="password" maxlength="20" placeholder="Password"
-      style="width:100%;box-sizing:border-box;padding:10px 14px;font-size:16px;border-radius:6px;
-             border:1px solid #ffd166;background:#1a2a44;color:#fff;outline:none;margin-bottom:12px;" />
+      style="width:100%;box-sizing:border-box;padding:10px 14px;font-size:16px;border-radius:6px;border:1px solid #ffd166;background:#1a2a44;color:#fff;outline:none;margin:10px 0;" />
     <div style="display:flex;gap:10px;justify-content:center;">
-      <button id="td-admin-submit" style="padding:9px 28px;background:#ffd166;color:#111;font-weight:700;
-        border:none;border-radius:6px;cursor:pointer;font-size:14px;">Unlock</button>
-      <button id="td-admin-cancel" style="padding:9px 28px;background:#3a506b;color:#fff;font-weight:700;
-        border:none;border-radius:6px;cursor:pointer;font-size:14px;">Cancel</button>
+      <button id="td-admin-submit" style="padding:9px 28px;background:#ffd166;color:#111;font-weight:700;border:none;border-radius:6px;cursor:pointer;">Unlock</button>
+      <button id="td-admin-cancel" style="padding:9px 28px;background:#3a506b;color:#fff;font-weight:700;border:none;border-radius:6px;cursor:pointer;">Cancel</button>
     </div>
-    <div id="td-admin-err" style="margin-top:10px;color:#ff595e;font-size:12px;min-height:16px;"></div>
+    <div id="td-admin-err" style="margin-top:8px;color:#ff595e;min-height:16px;"></div>
   `;
   root.appendChild(adminLoginBox);
-
-  document.getElementById('td-admin-submit').addEventListener('click', () => {
-    const val = document.getElementById('td-admin-pw').value;
-    if (val === ADMIN_PASSWORD) {
-      adminUnlocked = true;
-      showAdminPanel = true;
-      showAdminLogin = false;
-      adminLoginBox.style.display = 'none';
-      renderAdminPanel();
-      adminPanel.style.display = 'block';
-      document.getElementById('td-admin-err').textContent = '';
-    } else {
-      document.getElementById('td-admin-err').textContent = '❌ Incorrect password.';
-      document.getElementById('td-admin-pw').value = '';
-    }
-  });
-
-  document.getElementById('td-admin-cancel').addEventListener('click', () => {
-    showAdminLogin = false;
-    adminLoginBox.style.display = 'none';
-    document.getElementById('td-admin-pw').value = '';
-    document.getElementById('td-admin-err').textContent = '';
-  });
-
-  document.getElementById('td-admin-pw').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') document.getElementById('td-admin-submit').click();
-  });
-
-  function adminNotify(msg) {
-    adminMessage = msg;
-    adminMessageTimer = 180;
-  }
-
-  function renderAdminPanel() {
-    if (!adminUnlocked) return;
-    adminPanel.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <span style="font-size:16px;font-weight:700;color:#ffd166;">⚙ Admin Panel</span>
-        <button id="td-adm-close" style="background:#b23a48;border:none;color:#fff;border-radius:5px;
-          padding:3px 10px;cursor:pointer;font-size:13px;">✕ Close</button>
-      </div>
-      <div style="font-size:11px;color:#aaa;margin-bottom:8px;">Game Testing &amp; Debug Tools</div>
-
-      <div style="font-weight:700;color:#4cc9f0;margin:6px 0 4px;">💰 Economy</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-        <button class="adm-btn" data-action="add100">+$100</button>
-        <button class="adm-btn" data-action="add1000">+$1000</button>
-        <button class="adm-btn" data-action="add9999">+$9999</button>
-        <button class="adm-btn" data-action="maxmoney">Max Money</button>
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-        <button class="adm-btn" data-action="addcoins500">+500 Coins</button>
-        <button class="adm-btn" data-action="addmm500">+500 MM</button>
-        <button class="adm-btn" data-action="unlockall">Unlock All Towers</button>
-      </div>
-
-      <div style="font-weight:700;color:#4cc9f0;margin:6px 0 4px;">❤ Lives</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-        <button class="adm-btn" data-action="lives1">Set Lives: 1</button>
-        <button class="adm-btn" data-action="lives100">Set Lives: 100</button>
-        <button class="adm-btn" data-action="lives9999">Set Lives: 9999</button>
-        <button class="adm-btn" data-action="godmode">God Mode (∞ Lives)</button>
-      </div>
-
-      <div style="font-weight:700;color:#4cc9f0;margin:6px 0 4px;">🌊 Waves</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-        <button class="adm-btn" data-action="skipwave">Skip to Next Wave</button>
-        <button class="adm-btn" data-action="wave10">Jump to Wave 10</button>
-        <button class="adm-btn" data-action="wave25">Jump to Wave 25</button>
-        <button class="adm-btn" data-action="wave45">Jump to Wave 45</button>
-        <button class="adm-btn" data-action="clearbloons">Clear All Bloons</button>
-      </div>
-
-      <div style="font-weight:700;color:#4cc9f0;margin:6px 0 4px;">⭐ XP / Level</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-        <button class="adm-btn" data-action="addxp500">+500 XP</button>
-        <button class="adm-btn" data-action="levelup5">+5 Levels</button>
-        <button class="adm-btn" data-action="maxlevel">Max Level (50)</button>
-        <button class="adm-btn" data-action="addpoints5">+5 Meta Points</button>
-      </div>
-
-      <div style="font-weight:700;color:#4cc9f0;margin:6px 0 4px;">🗼 Selected Tower</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-        <button class="adm-btn" data-action="tower_maxupgrade">Max All Upgrades</button>
-        <button class="adm-btn" data-action="tower_pro">Force PRO</button>
-        <button class="adm-btn" data-action="tower_mastery">Force Mastery</button>
-        <button class="adm-btn" data-action="tower_maxdmg">+10 Damage</button>
-        <button class="adm-btn" data-action="tower_maxrange">+100 Range</button>
-      </div>
-
-      <div style="font-weight:700;color:#4cc9f0;margin:6px 0 4px;">🧪 Bloon Spawn</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-        <button class="adm-btn" data-action="spawn_moab">Spawn MOAB</button>
-        <button class="adm-btn" data-action="spawn_bfb">Spawn BFB</button>
-        <button class="adm-btn" data-action="spawn_ceramic10">Spawn 10 Ceramics</button>
-        <button class="adm-btn" data-action="spawn_rainbow10">Spawn 10 Rainbows</button>
-      </div>
-
-      <div style="font-weight:700;color:#4cc9f0;margin:6px 0 4px;">🔧 Debug</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-        <button class="adm-btn" data-action="winrun">Instant Win Run</button>
-        <button class="adm-btn" data-action="resetprofile">Reset Profile</button>
-        <button class="adm-btn" data-action="autospeed10">Speed 10x</button>
-        <button class="adm-btn" data-action="logstate">Log State</button>
-      </div>
-
-      <div id="td-adm-msg" style="margin-top:8px;min-height:18px;color:#8bc34a;font-size:12px;font-weight:600;"></div>
-    `;
-
-    adminPanel.querySelectorAll('.adm-btn').forEach((btn) => {
-      Object.assign(btn.style, {
-        padding: '5px 10px', background: '#1e3a5f', color: '#fff', border: '1px solid #4cc9f055',
-        borderRadius: '5px', cursor: 'pointer', fontSize: '12px', fontWeight: '600',
-      });
-      btn.addEventListener('mouseenter', () => btn.style.background = '#2a5080');
-      btn.addEventListener('mouseleave', () => btn.style.background = '#1e3a5f');
-      btn.addEventListener('click', () => handleAdminAction(btn.dataset.action));
-    });
-
-    document.getElementById('td-adm-close').addEventListener('click', () => {
-      showAdminPanel = false;
-      adminPanel.style.display = 'none';
-    });
-  }
-
-  function handleAdminAction(action) {
-    const notify = (msg) => {
-      const el = document.getElementById('td-adm-msg');
-      if (el) el.textContent = '✔ ' + msg;
-      setTimeout(() => { if (el) el.textContent = ''; }, 2500);
-    };
-
-    switch (action) {
-      case 'add100':    state.money += 100; notify('+$100'); break;
-      case 'add1000':   state.money += 1000; notify('+$1000'); break;
-      case 'add9999':   state.money += 9999; notify('+$9999'); break;
-      case 'maxmoney':  state.money = 9999999; notify('Money maxed'); break;
-
-      case 'addcoins500':
-        profile.coins += 500; saveProfile(); notify('+500 Coins'); break;
-      case 'addmm500':
-        profile.monkeyMoney += 500; saveProfile(); notify('+500 Monkey Money'); break;
-      case 'unlockall':
-        Object.keys(profile.unlockedSpecialTowers).forEach(k => profile.unlockedSpecialTowers[k] = true);
-        saveProfile(); notify('All premium towers unlocked'); break;
-
-      case 'lives1':    state.lives = 1; notify('Lives set to 1'); break;
-      case 'lives100':  state.lives = 100; notify('Lives set to 100'); break;
-      case 'lives9999': state.lives = 9999; notify('Lives set to 9999'); break;
-      case 'godmode':
-        state.lives = Infinity;
-        gameOver = false;
-        notify('God Mode ON (∞ lives)'); break;
-
-      case 'skipwave':
-        bloons.length = 0; waveQueue = []; waveInProgress = false;
-        state.wave += 1; notify(`Skipped to Wave ${state.wave}`); break;
-      case 'wave10':
-        bloons.length = 0; waveQueue = []; waveInProgress = false;
-        state.wave = 10; notify('Jumped to Wave 10'); break;
-      case 'wave25':
-        bloons.length = 0; waveQueue = []; waveInProgress = false;
-        state.wave = 25; notify('Jumped to Wave 25'); break;
-      case 'wave45':
-        bloons.length = 0; waveQueue = []; waveInProgress = false;
-        state.wave = 45; notify('Jumped to Wave 45'); break;
-      case 'clearbloons':
-        bloons.length = 0; notify('All bloons cleared'); break;
-
-      case 'addxp500':  gainXp(500); notify('+500 XP'); break;
-      case 'levelup5':
-        for (let i = 0; i < 5; i++) { progression.xp = xpToNextLevel(progression.level); gainXp(0); progression.level++; progression.points++; }
-        notify('+5 Levels'); break;
-      case 'maxlevel':
-        progression.level = 50; progression.xp = 0; progression.points += 10; notify('Level set to 50'); break;
-      case 'addpoints5':
-        progression.points += 5; notify('+5 Meta Points'); break;
-
-      case 'tower_maxupgrade':
-        if (state.selectedTower) {
-          const t = state.selectedTower;
-          for (let p = 0; p < 3; p++) { while (t.upgrades[p] < 5 && canUpgradePath(t, p)) applyTowerUpgrade(t, p); }
-          notify('Selected tower maxed');
-        } else notify('No tower selected');
-        break;
-      case 'tower_pro':
-        if (state.selectedTower) { state.selectedTower.pro = true; notify('PRO forced'); }
-        else notify('No tower selected'); break;
-      case 'tower_mastery':
-        if (state.selectedTower) { state.selectedTower.pro = true; state.selectedTower.proMastery = true; notify('Mastery forced'); }
-        else notify('No tower selected'); break;
-      case 'tower_maxdmg':
-        if (state.selectedTower) { state.selectedTower.damage += 10; notify('+10 Damage'); }
-        else notify('No tower selected'); break;
-      case 'tower_maxrange':
-        if (state.selectedTower) { state.selectedTower.range += 100; notify('+100 Range'); }
-        else notify('No tower selected'); break;
-
-      case 'spawn_moab':
-        if (currentScreen === 'game') { bloons.push(createBloon('moab', 0)); notify('MOAB spawned'); }
-        break;
-      case 'spawn_bfb':
-        if (currentScreen === 'game') { bloons.push(createBloon('bfb', 0)); notify('BFB spawned'); }
-        break;
-      case 'spawn_ceramic10':
-        if (currentScreen === 'game') { for (let i = 0; i < 10; i++) bloons.push(createBloon('ceramic', i % getMapPaths().length)); notify('10 Ceramics spawned'); }
-        break;
-      case 'spawn_rainbow10':
-        if (currentScreen === 'game') { for (let i = 0; i < 10; i++) bloons.push(createBloon('rainbow', i % getMapPaths().length)); notify('10 Rainbows spawned'); }
-        break;
-
-      case 'winrun':
-        runWon = true; notify('Run instantly won'); break;
-      case 'resetprofile':
-        profile.coins = 0; profile.monkeyMoney = 0;
-        Object.keys(profile.unlockedSpecialTowers).forEach(k => profile.unlockedSpecialTowers[k] = false);
-        saveProfile(); notify('Profile reset'); break;
-      case 'autospeed10':
-        gameSpeed = 10; notify('Speed set to 10x'); break;
-      case 'logstate':
-        console.log('[TD ADMIN] State:', JSON.stringify({ state, progression, profile }, null, 2));
-        notify('State logged to console'); break;
-    }
-  }
-  // ── END ADMIN PANEL ──────────────────────────────────────────────────────────
 
   const SIDE_PANEL = 330;
   const TICK_MS = 1000 / 60;
@@ -337,9 +101,29 @@
     difficulty: 'medium',
   };
 
+  document.getElementById('td-admin-submit').addEventListener('click', () => {
+    const val = document.getElementById('td-admin-pw').value;
+    if (val === ADMIN_PASSWORD) {
+      adminUnlocked = true;
+      showAdminLogin = false;
+      showAdminPanel = true;
+      adminLoginBox.style.display = 'none';
+      renderAdminPanel();
+      adminPanel.style.display = 'block';
+      document.getElementById('td-admin-err').textContent = '';
+    } else {
+      document.getElementById('td-admin-err').textContent = 'Incorrect password';
+      document.getElementById('td-admin-pw').value = '';
+    }
+  });
+  document.getElementById('td-admin-cancel').addEventListener('click', () => {
+    showAdminLogin = false;
+    adminLoginBox.style.display = 'none';
+  });
+
   const agents = { spikes: 3, glueTrap: 2, farmer: 1 };
   let agentMode = null;
-  const placedAgents = [];
+  const placedAgents = []; // deprecated (agents removed from UI/controls)
 
   const towerDefs = {
     dart: { name: 'Dart', icon: '➤', color: '#8d6e63', cost: 170, range: 145, fireRate: 29, damage: 1, pierce: 1, projectileSpeed: 11, unlockLvl: 1,
@@ -377,8 +161,27 @@
       pathNames: { p1: ['More Bananas', 'Even More', 'Bountiful', 'Marketplace', 'Banana Central'], p2: ['Faster Harvest', 'Valuable Bananas', 'Banking', 'Big Bank', 'Wall Street'], p3: ['Fertilizer', 'Long Crates', 'Auto-Collect', 'Monkeynomics', 'God Farm'] } },
     support: { name: 'Support', icon: '✚', color: '#90a4ae', cost: 980, range: 170, fireRate: 99999, damage: 0, pierce: 0, projectileSpeed: 0, unlockLvl: 5,
       pathNames: { p1: ['Range Aura', 'Bigger Aura', 'Sharpen', 'Elite Range', 'Commander'], p2: ['Speed Aura', 'Faster Aura', 'Overclock', 'Ultra Boost', 'Time Warp'], p3: ['Detection', 'Lead Assist', 'Armor Crack', 'Boss Debuff', 'God Support'] } },
+    wizard: { name: 'Wizard', icon: '✧', color: '#7e57c2', cost: 520, range: 190, fireRate: 20, damage: 2, pierce: 2, projectileSpeed: 12, unlockLvl: 4,
+      pathNames: { p1: ['Arcane Power', 'Dragon Breath', 'Phoenix Spark', 'MOAB Hex', 'Archmage'], p2: ['Fast Cast', 'Fork Bolt', 'Mana Flood', 'Global Rune', 'Oracle'], p3: ['Camo Sight', 'Lead Melt', 'Flame Wall', 'Storm Fire', 'Mythic'] } },
+    engineer: { name: 'Engineer', icon: '⚙', color: '#90a4ae', cost: 600, range: 155, fireRate: 24, damage: 1, pierce: 2, projectileSpeed: 11, unlockLvl: 4,
+      pathNames: { p1: ['Nail Gun+', 'Heavy Nails', 'Sentry Drop', 'MOAB Rivets', 'Overclock'], p2: ['Faster Build', 'Trap', 'Bigger Trap', 'Support Grid', 'Factory'], p3: ['Intel Tools', 'Pin', 'Armor Crack', 'Mega Rivet', 'Mech'] } },
+    alchemist: { name: 'Alchemist', icon: '⚗', color: '#66bb6a', cost: 640, range: 150, fireRate: 30, damage: 1, pierce: 2, projectileSpeed: 10, unlockLvl: 5,
+      pathNames: { p1: ['Acid Mix', 'Lead Melt', 'MOAB Acid', 'Unstable Brew', 'Solver'], p2: ['Stim Brew', 'Berserker Brew', 'Permanent Brew', 'Catalyst Aura', 'Elixir'], p3: ['Potion+', 'Corrode+', 'Tonic', 'Toxic Cloud', 'Philosopher'] } },
+    druid: { name: 'Druid', icon: '☘', color: '#2e7d32', cost: 560, range: 180, fireRate: 23, damage: 2, pierce: 2, projectileSpeed: 12, unlockLvl: 5,
+      pathNames: { p1: ['Thorns+', 'Brambles', 'Vine Crush', 'Nature Fury', 'Wild'], p2: ['Tempest', 'Storm+', 'Tornado', 'Hurricane', 'Cyclone'], p3: ['Wrath', 'Wrath+', 'Primal', 'Forest Call', 'Grove'] } },
+    mortar: { name: 'Mortar', icon: '✦', color: '#8d6e63', cost: 780, range: 5000, fireRate: 46, damage: 3, pierce: 2, projectileSpeed: 8, splash: 92, unlockLvl: 6,
+      pathNames: { p1: ['Blast Radius+', 'Shell Shock', 'Heavy Shell', 'MOAB Barrage', 'Siege'], p2: ['Fast Reload', 'Artillery', 'Rapid Fire', 'Incendiary', 'Napalm'], p3: ['Targeting+', 'Signal', 'Shrapnel', 'Shockwave', 'Quake'] } },
+    storm: { name: 'Storm', icon: '☄', color: '#29b6f6', cost: 920, range: 210, fireRate: 18, damage: 2, pierce: 3, projectileSpeed: 14, unlockLvl: 7,
+      pathNames: { p1: ['Lightning+', 'Chain Bolt', 'Thunderstrike', 'Sky Wrath', 'Tempest'], p2: ['Wind+', 'Gale', 'Cyclone', 'Perma Squall', 'Vortex'], p3: ['Static', 'Static+', 'Ion', 'EMP', 'Nova'] } },
+    submarine: { name: 'Sub', icon: '⟁', color: '#4fc3f7', cost: 680, range: 205, fireRate: 20, damage: 2, pierce: 2, projectileSpeed: 12, unlockLvl: 5,
+      pathNames: { p1: ['Torpedo+', 'Radar Sonar', 'Hunter', 'Armor Piercer', 'Kraken'], p2: ['Faster Sonar', 'Missile', 'Depth Charge', 'Wave Break', 'Fleet'], p3: ['Dive', 'Dive+', 'Stealth', 'Silent Run', 'Abyss'] } },
+    boat: { name: 'Boat', icon: '⛵', color: '#64b5f6', cost: 740, range: 195, fireRate: 22, damage: 2, pierce: 3, projectileSpeed: 11, unlockLvl: 5,
+      pathNames: { p1: ['Cannons+', 'Double Shot', 'Grape Burst', 'MOAB Hook', 'Frigate'], p2: ['Trade Deck', 'Deck Guns', 'Rapid Deck', 'Carrier', 'Convoy'], p3: ['Scout', 'Scout+', 'Escort', 'Destroyer', 'Dreadnought'] } },
+    commander: { name: 'Commander', icon: '★', color: '#ffb703', cost: 950, range: 230, fireRate: 10, damage: 2, pierce: 2, projectileSpeed: 13, unlockLvl: 6,
+      pathNames: { p1: ['Damage+', 'Lead Rounds', 'MOAB Rounds', 'Overdrive', 'Prime'], p2: ['Move Speed+', 'Aim Assist', 'Drone Shot', 'Heroic Pace', 'Control'], p3: ['Armor Intel', 'Callout', 'Squad Buff', 'Tactical Grid', 'Ghost'] } },
   };
 
+  // NEW: ensure every tower has a 3rd path with 5 tiers for BTD-style 3-path UI/logic.
   Object.keys(towerDefs).forEach((k) => {
     const d = towerDefs[k];
     if (!d.pathNames) d.pathNames = {};
@@ -421,6 +224,200 @@
     localStorage.setItem('td_coins', String(profile.coins));
     localStorage.setItem('td_mm', String(profile.monkeyMoney));
     localStorage.setItem('td_unlocks', JSON.stringify(profile.unlockedSpecialTowers));
+  }
+
+  function renderAdminPanel() {
+    if (!adminUnlocked) return;
+    adminPanel.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <b style="color:#ffd166">⚙ Admin Console</b>
+        <button id="td-adm-close" style="background:#b23a48;color:#fff;border:none;border-radius:4px;padding:3px 10px;cursor:pointer;">Close</button>
+      </div>
+      <div style="color:#9fd3ff;font-size:12px;margin-bottom:6px;">Economy</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+        <button class="adm-btn" data-action="money_1000">+$1k</button>
+        <button class="adm-btn" data-action="money_10000">+$10k</button>
+        <button class="adm-btn" data-action="coins_500">+500 Coins</button>
+        <button class="adm-btn" data-action="mm_500">+500 MM</button>
+        <button class="adm-btn" data-action="unlock_all">Unlock Premium</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:10px;">
+        <input id="td-adm-money" type="number" placeholder="Set cash" style="flex:1;min-width:0;padding:5px;border-radius:4px;border:1px solid #4cc9f066;background:#10233d;color:#fff;" />
+        <button class="adm-btn" data-action="set_money">Set</button>
+      </div>
+
+      <div style="color:#9fd3ff;font-size:12px;margin-bottom:6px;">Run Control</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+        <button class="adm-btn" data-action="lives_inf">God Lives</button>
+        <button class="adm-btn" data-action="full_heal">Full Heal</button>
+        <button class="adm-btn" data-action="clear_bloons">Clear Bloons</button>
+        <button class="adm-btn" data-action="clear_projectiles">Clear Shots</button>
+        <button class="adm-btn" data-action="win_run">Force Win</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:10px;">
+        <input id="td-adm-wave" type="number" min="1" max="${MAX_WAVES}" placeholder="Wave #" style="flex:1;min-width:0;padding:5px;border-radius:4px;border:1px solid #4cc9f066;background:#10233d;color:#fff;" />
+        <button class="adm-btn" data-action="set_wave">Jump</button>
+      </div>
+
+      <div style="color:#9fd3ff;font-size:12px;margin-bottom:6px;">Tower Commands (selected tower)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+        <button class="adm-btn" data-action="upgrade_selected_max">Upgrade Max</button>
+        <button class="adm-btn" data-action="pro_selected">Grant PRO</button>
+        <button class="adm-btn" data-action="mastery_selected">Grant Mastery</button>
+        <button class="adm-btn" data-action="sell_selected">Sell Selected</button>
+        <button class="adm-btn" data-action="upgrade_all_max">Upgrade All</button>
+      </div>
+
+      <div style="color:#9fd3ff;font-size:12px;margin-bottom:6px;">Custom Spawn</div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+        <select id="td-adm-spawn-type" style="flex:1;min-width:110px;padding:5px;border-radius:4px;border:1px solid #4cc9f066;background:#10233d;color:#fff;">
+          ${Object.keys(bloonCatalog).map((k) => `<option value="${k}">${k.toUpperCase()}</option>`).join('')}
+        </select>
+        <input id="td-adm-spawn-count" type="number" min="1" max="500" value="10" style="width:72px;padding:5px;border-radius:4px;border:1px solid #4cc9f066;background:#10233d;color:#fff;" />
+        <input id="td-adm-spawn-lane" type="number" min="-1" max="9" value="-1" style="width:72px;padding:5px;border-radius:4px;border:1px solid #4cc9f066;background:#10233d;color:#fff;" />
+        <button class="adm-btn" data-action="spawn_custom">Spawn</button>
+      </div>
+      <div style="font-size:11px;color:#a7bed3;margin-bottom:8px;">Lane: -1 = cycle all lanes</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="adm-btn" data-action="spawn_moab">MOAB</button>
+        <button class="adm-btn" data-action="spawn_bfb">BFB</button>
+        <button class="adm-btn" data-action="spawn_mixed">Mixed Pack</button>
+      </div>
+      <div id="td-adm-msg" style="margin-top:8px;color:#8bc34a;min-height:16px;"></div>
+    `;
+    adminPanel.querySelectorAll('.adm-btn').forEach((b) => {
+      Object.assign(b.style, { padding: '5px 8px', background: '#1e3a5f', border: '1px solid #4cc9f066', color: '#fff', borderRadius: '4px', cursor: 'pointer' });
+      b.addEventListener('click', () => handleAdminAction(b.dataset.action));
+    });
+    document.getElementById('td-adm-close').onclick = () => { showAdminPanel = false; adminPanel.style.display = 'none'; };
+  }
+
+  function adminMsg(msg) {
+    const el = document.getElementById('td-adm-msg');
+    if (!el) return;
+    el.textContent = `✔ ${msg}`;
+    setTimeout(() => { if (el) el.textContent = ''; }, 1800);
+  }
+
+  function parseAdminNumber(id, fallback = 0) {
+    const el = document.getElementById(id);
+    if (!el) return fallback;
+    const val = Number(el.value);
+    return Number.isFinite(val) ? val : fallback;
+  }
+
+  function getSelectedTowerSafe() {
+    if (!state.selectedTower) return null;
+    if (!towers.includes(state.selectedTower)) return null;
+    return state.selectedTower;
+  }
+
+  function upgradeTowerFully(tower) {
+    if (!tower) return false;
+    let pathIndex = tower.upgrades.findIndex((lvl) => lvl > 0);
+    if (pathIndex === -1) pathIndex = 0;
+    let changed = false;
+    while (tower.upgrades[pathIndex] < 5) {
+      applyTowerUpgrade(tower, pathIndex);
+      changed = true;
+    }
+    return changed;
+  }
+
+  function spawnBloonsCustom(type, count, lane) {
+    const mapLaneCount = getMapPaths().length;
+    if (!bloonCatalog[type]) return 0;
+    const safeCount = Math.max(1, Math.min(500, Math.floor(count || 1)));
+    for (let i = 0; i < safeCount; i++) {
+      const laneIndex = lane >= 0
+        ? Math.max(0, Math.min(mapLaneCount - 1, lane))
+        : i % mapLaneCount;
+      bloons.push(createBloon(type, laneIndex));
+    }
+    return safeCount;
+  }
+
+  function handleAdminAction(action) {
+    switch (action) {
+      case 'money_1000': state.money += 1000; adminMsg('+$1000'); break;
+      case 'money_10000': state.money += 10000; adminMsg('+$10000'); break;
+      case 'coins_500': profile.coins += 500; saveProfile(); adminMsg('+500 Coins'); break;
+      case 'mm_500': profile.monkeyMoney += 500; saveProfile(); adminMsg('+500 MM'); break;
+      case 'unlock_all': Object.keys(profile.unlockedSpecialTowers).forEach((k) => { profile.unlockedSpecialTowers[k] = true; }); saveProfile(); adminMsg('Unlocked all premium'); break;
+      case 'set_money': {
+        const cash = Math.max(0, Math.floor(parseAdminNumber('td-adm-money', state.money)));
+        state.money = cash;
+        adminMsg(`Cash set to $${cash}`);
+        break;
+      }
+      case 'lives_inf': state.lives = Infinity; gameOver = false; adminMsg('Infinite lives'); break;
+      case 'full_heal': {
+        state.lives = difficultyDefs[state.difficulty].lives;
+        gameOver = false;
+        adminMsg(`Lives restored to ${state.lives}`);
+        break;
+      }
+      case 'clear_bloons': bloons.length = 0; adminMsg('Bloons cleared'); break;
+      case 'clear_projectiles': projectiles.length = 0; adminMsg('Projectiles cleared'); break;
+      case 'win_run': state.wave = MAX_WAVES; waveQueue = []; bloons.length = 0; waveInProgress = false; runWon = true; adminMsg('Run forced to win state'); break;
+      case 'set_wave': {
+        const targetWave = Math.max(1, Math.min(MAX_WAVES, Math.floor(parseAdminNumber('td-adm-wave', state.wave))));
+        state.wave = targetWave;
+        waveQueue = [];
+        bloons.length = 0;
+        waveInProgress = false;
+        gameOver = false;
+        adminMsg(`Wave set to ${targetWave}`);
+        break;
+      }
+      case 'spawn_moab': bloons.push(createBloon('moab', 0)); adminMsg('Spawned MOAB'); break;
+      case 'spawn_bfb': bloons.push(createBloon('bfb', 0)); adminMsg('Spawned BFB'); break;
+      case 'spawn_mixed': ['moab', 'fortified', 'ceramic', 'rainbow', 'lead', 'bfb'].forEach((t, i) => bloons.push(createBloon(t, i % getMapPaths().length))); adminMsg('Spawned mixed pack'); break;
+      case 'spawn_custom': {
+        const type = document.getElementById('td-adm-spawn-type')?.value || 'red';
+        const count = parseAdminNumber('td-adm-spawn-count', 10);
+        const lane = Math.floor(parseAdminNumber('td-adm-spawn-lane', -1));
+        const spawned = spawnBloonsCustom(type, count, lane);
+        adminMsg(`Spawned ${spawned} ${type.toUpperCase()}`);
+        break;
+      }
+      case 'upgrade_selected_max': {
+        const tower = getSelectedTowerSafe();
+        if (!tower) { adminMsg('Select a tower first'); break; }
+        upgradeTowerFully(tower);
+        adminMsg(`${towerDefs[tower.type]?.name || 'Tower'} upgraded to max`);
+        break;
+      }
+      case 'upgrade_all_max': {
+        towers.forEach((tower) => upgradeTowerFully(tower));
+        adminMsg(`Upgraded ${towers.length} towers to max`);
+        break;
+      }
+      case 'pro_selected': {
+        const tower = getSelectedTowerSafe();
+        if (!tower) { adminMsg('Select a tower first'); break; }
+        tower.pro = true;
+        adminMsg('Selected tower granted PRO');
+        break;
+      }
+      case 'mastery_selected': {
+        const tower = getSelectedTowerSafe();
+        if (!tower) { adminMsg('Select a tower first'); break; }
+        tower.pro = true;
+        tower.proMastery = true;
+        adminMsg('Selected tower granted PRO Mastery');
+        break;
+      }
+      case 'sell_selected': {
+        const tower = getSelectedTowerSafe();
+        if (!tower) { adminMsg('Select a tower first'); break; }
+        const idx = towers.indexOf(tower);
+        if (idx >= 0) towers.splice(idx, 1);
+        state.selectedTower = null;
+        adminMsg('Selected tower sold');
+        break;
+      }
+    }
   }
 
   function applyMetaBonuses() {
@@ -535,6 +532,7 @@
   }
 
   function canUpgradePath(t, pathIndex) {
+    // UPDATED: 3-path, tier-5 cap. Only 2 paths can be active. Tier-5 locks others.
     if (t.upgrades[pathIndex] >= 5) return false;
     if (t.upgrades.some((lvl) => lvl >= 5 && lvl !== t.upgrades[pathIndex])) return false;
     const activeOtherPaths = t.upgrades.filter((lvl, i) => i !== pathIndex && lvl > 0).length;
@@ -557,6 +555,7 @@
     if (before >= 5) return;
     const tier = before + 1;
 
+    // UPDATED: tower-specific 3-path upgrade effects.
     switch (t.type) {
       case 'dart':
         if (pathIndex === 0) { t.pierce += 1; t.range += 10; }
@@ -684,6 +683,7 @@
         t.villageBuff.damage = Math.max(t.villageBuff.damage, v.supportDamage || 0);
       }
     }
+    // NEW: support tower aura buffs.
     const supports = towers.filter((t) => t.type === 'support');
     for (const s of supports) {
       for (const t of towers) {
@@ -710,6 +710,7 @@
   }
 
   function hitBloon(b, p) {
+    // UPDATED: special effects (camo/lead checks, burn, stun, armor break)
     if (b.camo && !p.canHitCamo) return;
     if (b.type === 'lead' && !p.canHitLead && p.type !== 'bomb') return;
     const immunity = p.type === 'bomb' ? 'explosive' : p.type === 'ice' ? 'ice' : 'sharp';
@@ -755,9 +756,11 @@
     applyMetaBonuses();
   }
 
-  function placeAgent() { return false; }
+  function placeAgent() { return false; } // agents removed
+
   function dropCashCrate() {}
 
+  // NEW: shared layout model so draw + click hitboxes always match.
   function getTowerCardLayout(panelX) {
     const cardY = height - 388;
     return {
@@ -841,12 +844,11 @@
       ctx.fillText(unlocked ? 'Ready in SHOP' : 'Click to unlock', x + 10, premiumY + 66);
     });
 
-    // Admin button on home screen
     ctx.fillStyle = adminUnlocked ? '#ffd166' : '#3a3a3a';
-    ctx.fillRect(width - SIDE_PANEL - 160, 20, 148, 34);
-    ctx.fillStyle = adminUnlocked ? '#111' : '#aaa';
+    ctx.fillRect(width - SIDE_PANEL - 160, 20, 148, 32);
+    ctx.fillStyle = adminUnlocked ? '#111' : '#bbb';
     ctx.font = '700 13px sans-serif';
-    ctx.fillText(adminUnlocked ? '⚙ Admin Panel' : '🔒 Admin Login', width - SIDE_PANEL - 148, 42);
+    ctx.fillText(adminUnlocked ? '⚙ Admin Panel' : '🔒 Admin Login', width - SIDE_PANEL - 148, 41);
   }
 
   function update() {
@@ -858,6 +860,8 @@
       spawnTimer = next.delay;
     }
     spawnTimer -= 1;
+
+    // agents/cash crates removed
 
     const paths = getMapPaths();
 
@@ -890,7 +894,7 @@
       if (dist < 6) b.pathIdx += 1;
 
       if (b.pathIdx >= path.length - 1) {
-        if (state.lives !== Infinity) state.lives -= b.damage;
+        state.lives -= b.damage;
         bloons.splice(i, 1);
       }
     }
@@ -1011,7 +1015,7 @@
       if (autoNextWave && !gameOver) startWave();
     }
 
-    if (state.lives !== Infinity && state.lives <= 0) {
+    if (state.lives <= 0) {
       state.lives = 0;
       gameOver = true;
     }
@@ -1113,12 +1117,11 @@
       ctx.fillStyle = gameSpeed === s ? '#111' : '#fff'; ctx.fillText(`${s}x`, bx + 38, by + 15);
     });
 
-    // Admin button in game panel
-    ctx.fillStyle = adminUnlocked ? '#b5840a' : '#2e2e2e';
+    ctx.fillStyle = adminUnlocked ? '#7c5c00' : '#2d2d2d';
     ctx.fillRect(panelX + 16, 174, SIDE_PANEL - 32, 24);
-    ctx.fillStyle = adminUnlocked ? '#ffd166' : '#888';
+    ctx.fillStyle = adminUnlocked ? '#ffd166' : '#999';
     ctx.font = '700 12px sans-serif';
-    ctx.fillText(adminUnlocked ? '⚙ Admin Panel (open)' : '🔒 Admin Login', panelX + 96, 190);
+    ctx.fillText(adminUnlocked ? '⚙ Admin Panel' : '🔒 Admin Login', panelX + 110, 190);
 
     const keys = Object.keys(towerDefs);
     const towerListTop = 204, towerRow = 62, visibleRows = 4;
@@ -1149,6 +1152,7 @@
     ctx.fillStyle = waveInProgress ? '#6c757d' : '#fca311'; ctx.fillRect(panelX + 18, waveY, SIDE_PANEL - 36, 42);
     ctx.fillStyle = '#111'; ctx.font = '700 16px sans-serif'; ctx.fillText(waveInProgress ? 'WAVE ACTIVE' : 'START WAVE', panelX + 106, waveY + 27);
 
+    // meta
     ctx.fillStyle = '#0d1b2a'; ctx.fillRect(panelX + 12, height - 160, SIDE_PANEL - 24, 96);
     ctx.fillStyle = '#fff'; ctx.font = '700 13px sans-serif'; ctx.fillText(`Meta Points: ${progression.points}`, panelX + 20, height - 140);
 
@@ -1196,7 +1200,7 @@
 
     ctx.fillStyle = '#fff'; ctx.font = '700 20px sans-serif';
     ctx.fillText(`$${Math.floor(state.money)}`, 20, 58);
-    ctx.fillText(state.lives === Infinity ? '❤ ∞ (GOD)' : `❤ ${state.lives}`, 20, 84);
+    ctx.fillText(`❤ ${state.lives}`, 20, 84);
     ctx.fillText(`Wave ${state.wave}`, 20, 110);
     ctx.fillText(`MM ${Math.floor(profile.monkeyMoney)}`, 20, 136);
 
@@ -1229,25 +1233,19 @@
 
   function onClick(e) {
     const x = e.clientX, y = e.clientY;
-
-    // Admin login box open — let its own HTML buttons handle it
     if (showAdminLogin) return;
 
     if (currentScreen === 'home') {
-      // Admin button on home screen
-      if (x >= width - SIDE_PANEL - 160 && x <= width - SIDE_PANEL - 12 && y >= 20 && y <= 54) {
+      if (x >= width - SIDE_PANEL - 160 && x <= width - SIDE_PANEL - 12 && y >= 20 && y <= 52) {
         if (adminUnlocked) {
           showAdminPanel = !showAdminPanel;
-          adminPanel.style.display = showAdminPanel ? 'block' : 'none';
-          if (showAdminPanel) renderAdminPanel();
+          if (showAdminPanel) { renderAdminPanel(); adminPanel.style.display = 'block'; } else adminPanel.style.display = 'none';
         } else {
           showAdminLogin = true;
           adminLoginBox.style.display = 'block';
-          setTimeout(() => document.getElementById('td-admin-pw')?.focus(), 50);
         }
         return;
       }
-
       const cardW = 220, gap = 26;
       const totalW = mapDefs.length * cardW + (mapDefs.length - 1) * gap;
       const startX = (width - SIDE_PANEL - totalW) / 2;
@@ -1285,33 +1283,27 @@
     const panelX = width - SIDE_PANEL;
     if (gameOver || runWon) {
       const clickedHome = x >= panelX + 16 && x <= width - 16 && y >= 56 && y <= 90;
-      if (clickedHome) { currentScreen = 'home'; adminPanel.style.display = 'none'; showAdminPanel = false; }
+      if (clickedHome) currentScreen = 'home';
       return;
     }
 
     if (x >= panelX) {
-      if (x >= panelX + 16 && x <= width - 16 && y >= 56 && y <= 90) {
-        currentScreen = 'home'; adminPanel.style.display = 'none'; showAdminPanel = false; return;
-      }
+      if (x >= panelX + 16 && x <= width - 16 && y >= 56 && y <= 90) { currentScreen = 'home'; return; }
       if (x >= panelX + 16 && x <= width - 16 && y >= 96 && y <= 126) { autoNextWave = !autoNextWave; return; }
+      if (x >= panelX + 16 && x <= width - 16 && y >= 174 && y <= 198) {
+        if (adminUnlocked) {
+          showAdminPanel = !showAdminPanel;
+          if (showAdminPanel) { renderAdminPanel(); adminPanel.style.display = 'block'; } else adminPanel.style.display = 'none';
+        } else {
+          showAdminLogin = true;
+          adminLoginBox.style.display = 'block';
+        }
+        return;
+      }
 
       for (const [idx, s] of [2, 5, 10].entries()) {
         const bx = panelX + 16 + idx * 96, by = 148;
         if (x >= bx && x <= bx + 88 && y >= by && y <= by + 22) { gameSpeed = s; return; }
-      }
-
-      // Admin button in game panel
-      if (x >= panelX + 16 && x <= width - 16 && y >= 174 && y <= 198) {
-        if (adminUnlocked) {
-          showAdminPanel = !showAdminPanel;
-          adminPanel.style.display = showAdminPanel ? 'block' : 'none';
-          if (showAdminPanel) renderAdminPanel();
-        } else {
-          showAdminLogin = true;
-          adminLoginBox.style.display = 'block';
-          setTimeout(() => document.getElementById('td-admin-pw')?.focus(), 50);
-        }
-        return;
       }
 
       const t = state.selectedTower;
@@ -1354,7 +1346,7 @@
       }
 
       const keys = Object.keys(towerDefs);
-      const towerListTop = 204, towerRow = 62, visibleRows = 4;
+      const towerListTop = 184, towerRow = 62, visibleRows = 4;
       const visibleKeys = keys.slice(shopScroll, shopScroll + visibleRows);
       for (let i = 0; i < visibleKeys.length; i++) {
         const yy = towerListTop + i * towerRow;
@@ -1408,8 +1400,7 @@
   function onPointerDown(e) {
     if (!document.body.contains(root)) return;
     if (e.button !== undefined && e.button !== 0) return;
-    // Don't intercept clicks inside the admin HTML overlays
-    if (adminLoginBox.contains(e.target) || adminPanel.contains(e.target)) return;
+    if (adminPanel.contains(e.target) || adminLoginBox.contains(e.target)) return;
     onClick(e);
     e.preventDefault();
   }
@@ -1444,18 +1435,8 @@
   function onKeydown(e) {
     const k = e.key.toLowerCase();
     if (e.key === 'Escape') {
-      if (showAdminLogin) {
-        showAdminLogin = false;
-        adminLoginBox.style.display = 'none';
-        document.getElementById('td-admin-pw').value = '';
-        document.getElementById('td-admin-err').textContent = '';
-        return;
-      }
-      if (showAdminPanel) {
-        showAdminPanel = false;
-        adminPanel.style.display = 'none';
-        return;
-      }
+      if (showAdminLogin) { showAdminLogin = false; adminLoginBox.style.display = 'none'; return; }
+      if (showAdminPanel) { showAdminPanel = false; adminPanel.style.display = 'none'; return; }
       destroy();
     }
     if (k === 'r' && gameOver) resetRun();
@@ -1466,16 +1447,13 @@
       resetRun();
     }
     if (k === 'p' && state.selectedTower) applyProMastery(state.selectedTower);
-    // Secret keyboard shortcut: Ctrl+Shift+A opens admin login
     if (e.ctrlKey && e.shiftKey && k === 'a') {
       if (adminUnlocked) {
         showAdminPanel = !showAdminPanel;
-        adminPanel.style.display = showAdminPanel ? 'block' : 'none';
-        if (showAdminPanel) renderAdminPanel();
+        if (showAdminPanel) { renderAdminPanel(); adminPanel.style.display = 'block'; } else adminPanel.style.display = 'none';
       } else {
         showAdminLogin = true;
         adminLoginBox.style.display = 'block';
-        setTimeout(() => document.getElementById('td-admin-pw')?.focus(), 50);
       }
     }
   }
