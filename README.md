@@ -1,9 +1,3 @@
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/README.md b/README.md
-index f5605102a2116c609d90da8da0d86200b30d3240..8fed246fa8c5030567bd99af65eefdb9d0cf7fcb 100644
---- a/README.md
-+++ b/README.md
-@@ -1,2 +1,38 @@
 -# Console-tower-defense-
 -a tower defense game
 +# Console Tower Defense (Single Copy-Paste Script)
@@ -44,6 +38,3 @@ index f5605102a2116c609d90da8da0d86200b30d3240..8fed246fa8c5030567bd99af65eefdb9
 +- Beat wave 45 to win and bank coins + Monkey Money.
 +- Press `R` after game over to restart run.
 +- Press `Esc` anytime to close overlay.
- 
-EOF
-)
