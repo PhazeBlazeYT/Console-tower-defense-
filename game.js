@@ -59,6 +59,7 @@
   const SIDE_PANEL = 330;
   const TICK_MS = 1000 / 60;
   const MAX_WAVES = 45;
+  const HOME_CENTER_X_OFFSET = 42;
 
   let width = 0, height = 0;
   let gameOver = false, runWon = false;
@@ -181,6 +182,16 @@
     commander: { name: 'Commander', icon: '★', color: '#ffb703', cost: 950, range: 230, fireRate: 10, damage: 2, pierce: 2, projectileSpeed: 13, unlockLvl: 6,
       pathNames: { p1: ['Damage+', 'Lead Rounds', 'MOAB Rounds', 'Overdrive', 'Prime'], p2: ['Move Speed+', 'Aim Assist', 'Drone Shot', 'Heroic Pace', 'Control'], p3: ['Armor Intel', 'Callout', 'Squad Buff', 'Tactical Grid', 'Ghost'] } },
   };
+
+  const towerIconFallbacks = {
+    dart: '➤', ninja: '✦', bomb: '✹', ice: '❄', sniper: '◉', boomerang: '◌', tack: '✸', glue: '●',
+    village: '⌂', super: '⬢', laser: '═', plasma: '✺', sun: '☀', farm: '▦', support: '✚', wizard: '✧',
+    engineer: '⚙', alchemist: '⚗', druid: '☘', mortar: '✦', storm: '☄', submarine: '⟁', boat: '⛵', commander: '★',
+  };
+
+  Object.keys(towerDefs).forEach((k) => {
+    if (!towerDefs[k].icon) towerDefs[k].icon = towerIconFallbacks[k] || '◆';
+  });
 
   // NEW: ensure every tower has a 3rd path with 5 tiers for BTD-style 3-path UI/logic.
   Object.keys(towerDefs).forEach((k) => {
@@ -843,7 +854,7 @@
 
   function drawHome() {
     const playWidth = width - SIDE_PANEL;
-    const playCenterX = playWidth / 2;
+    const playCenterX = playWidth / 2 + HOME_CENTER_X_OFFSET;
 
     ctx.fillStyle = '#102a43';
     ctx.fillRect(0, 0, width, height);
@@ -924,12 +935,15 @@
 
     const premiumKeys = Object.keys(towerDefs).filter((k) => towerDefs[k].unlockCoins);
     const premiumY = 560, premiumCardW = 150, premiumGap = 12;
+    const premiumTotalW = premiumKeys.length * premiumCardW + Math.max(0, premiumKeys.length - 1) * premiumGap;
+    const premiumStartX = playCenterX - premiumTotalW / 2;
     ctx.fillStyle = '#fff'; ctx.font = '700 18px sans-serif';
-    ctx.fillText('Premium Tower Unlocks (Home Only)', 22, premiumY - 12);
+    const premiumTitle = 'Premium Tower Unlocks (Home Only)';
+    ctx.fillText(premiumTitle, playCenterX - ctx.measureText(premiumTitle).width / 2, premiumY - 12);
 
     premiumKeys.forEach((k, i) => {
       const d = towerDefs[k];
-      const x = 20 + i * (premiumCardW + premiumGap);
+      const x = premiumStartX + i * (premiumCardW + premiumGap);
       const unlocked = profile.unlockedSpecialTowers[k];
       ctx.fillStyle = unlocked ? '#2e7d32' : '#37474f';
       ctx.fillRect(x, premiumY, premiumCardW, 84);
@@ -941,11 +955,14 @@
       ctx.fillText(unlocked ? 'Ready in SHOP' : 'Click to unlock', x + 10, premiumY + 66);
     });
 
+    const adminW = 148;
+    const adminX = playCenterX - adminW / 2;
     ctx.fillStyle = adminUnlocked ? '#ffd166' : '#3a3a3a';
-    ctx.fillRect(width - SIDE_PANEL - 160, 20, 148, 32);
+    ctx.fillRect(adminX, 20, adminW, 32);
     ctx.fillStyle = adminUnlocked ? '#111' : '#bbb';
     ctx.font = '700 13px sans-serif';
-    ctx.fillText(adminUnlocked ? '⚙ Admin Panel' : '🔒 Admin Login', width - SIDE_PANEL - 148, 41);
+    const adminLabel = adminUnlocked ? '⚙ Admin Panel' : '🔒 Admin Login';
+    ctx.fillText(adminLabel, playCenterX - ctx.measureText(adminLabel).width / 2, 41);
   }
 
   function update() {
@@ -1034,9 +1051,10 @@
       const a = Math.atan2(target.y - t.y, target.x - t.x);
       const addProjectile = (angle) => {
         const maxTravel = t.type === 'tack' ? Math.max(90, t.range * 0.95) : Math.max(220, t.range * 1.4);
+        const fastProjectileSpeed = Math.max(24, t.projectileSpeed * 3.5);
         projectiles.push({
           x: t.x, y: t.y,
-          vx: Math.cos(angle) * t.projectileSpeed, vy: Math.sin(angle) * t.projectileSpeed,
+          vx: Math.cos(angle) * fastProjectileSpeed, vy: Math.sin(angle) * fastProjectileSpeed,
           type: t.type, pierce: t.pierce + (t.villageBuff?.pierce || 0), damage: t.damage + (t.villageBuff?.damage || 0),
           splash: t.splash, glueSlow: t.glueSlow, glueTicks: t.glueTicks,
           freezeDuration: t.freezeDuration,
@@ -1367,9 +1385,9 @@
 
     if (currentScreen === 'home') {
       const playWidth = width - SIDE_PANEL;
-      const playCenterX = playWidth / 2;
+      const playCenterX = playWidth / 2 + HOME_CENTER_X_OFFSET;
 
-      if (x >= width - SIDE_PANEL - 160 && x <= width - SIDE_PANEL - 12 && y >= 20 && y <= 52) {
+      if (x >= playCenterX - 74 && x <= playCenterX + 74 && y >= 20 && y <= 52) {
         if (adminUnlocked) {
           showAdminPanel = !showAdminPanel;
           if (showAdminPanel) { renderAdminPanel(); adminPanel.style.display = 'block'; } else adminPanel.style.display = 'none';
@@ -1412,10 +1430,12 @@
 
       const premiumKeys = Object.keys(towerDefs).filter((k) => towerDefs[k].unlockCoins);
       const premiumY = 560, premiumCardW = 150, premiumGap = 12;
+      const premiumTotalW = premiumKeys.length * premiumCardW + Math.max(0, premiumKeys.length - 1) * premiumGap;
+      const premiumStartX = playCenterX - premiumTotalW / 2;
       for (let i = 0; i < premiumKeys.length; i++) {
         const key = premiumKeys[i];
         const d = towerDefs[key];
-        const px = 20 + i * (premiumCardW + premiumGap);
+        const px = premiumStartX + i * (premiumCardW + premiumGap);
         if (x >= px && x <= px + premiumCardW && y >= premiumY && y <= premiumY + 84) {
           if (!profile.unlockedSpecialTowers[key] && profile.coins >= d.unlockCoins) {
             profile.coins -= d.unlockCoins;
